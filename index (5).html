@@ -1,0 +1,2378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Bent Pyramid — Sneferu, Dahshur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link
+href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Jost:wght@200;300;400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap"
+rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+TOKENS
+══════════════════════════════════════════ */
+:root {
+--bg: #09080b;
+--bg2: #0d0c0f;
+--ink: #ede3ce;
+--ink60: rgba(237, 227, 206, .6);
+--ink35: rgba(237, 227, 206, .35);
+--ink15: rgba(237, 227, 206, .15);
+--gold: #b5904c;
+--gold50: rgba(181, 144, 76, .5);
+--gold20: rgba(181, 144, 76, .2);
+--gold08: rgba(181, 144, 76, .08);
+--rule: rgba(181, 144, 76, .18);
+}
+
+*,
+*::before,
+*::after {
+box-sizing: border-box;
+margin: 0;
+padding: 0
+}
+
+html {
+scroll-behavior: smooth;
+font-size: 16px
+}
+
+body {
+background: var(--bg);
+color: var(--ink);
+font-family: 'Libre Baskerville', Georgia, serif;
+overflow-x: hidden;
+cursor: none;
+-webkit-font-smoothing: antialiased;
+}
+
+/* grain */
+body::before {
+content: '';
+position: fixed;
+inset: 0;
+pointer-events: none;
+z-index: 9000;
+background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+opacity: .02;
+}
+
+/* ══════════════════════════════════════════
+CURSOR
+══════════════════════════════════════════ */
+#cur {
+position: fixed;
+pointer-events: none;
+z-index: 9999;
+width: 10px;
+height: 10px;
+background: var(--gold);
+border-radius: 50%;
+transform: translate(-50%, -50%);
+transition: width .25s, height .25s, opacity .25s;
+mix-blend-mode: difference;
+}
+
+#cur-ring {
+position: fixed;
+pointer-events: none;
+z-index: 9998;
+width: 34px;
+height: 34px;
+border: 1px solid var(--gold50);
+border-radius: 50%;
+transform: translate(-50%, -50%);
+transition: left .08s, top .08s, width .25s, height .25s, opacity .3s, border-color .3s;
+}
+
+body:has(a:hover) #cur-ring,
+body:has(button:hover) #cur-ring {
+width: 50px;
+height: 50px;
+border-color: var(--gold);
+}
+
+/* ══════════════════════════════════════════
+NAV
+══════════════════════════════════════════ */
+nav {
+position: fixed;
+top: 1.1rem;
+left: 50%;
+transform: translateX(-50%);
+z-index: 800;
+padding: .85rem 2.8rem;
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 3rem;
+width: max-content;
+max-width: 92vw;
+background: rgba(101, 68, 18, .38);
+backdrop-filter: blur(22px);
+-webkit-backdrop-filter: blur(22px);
+border: 1px solid rgba(181, 144, 76, .28);
+border-radius: 999px;
+box-shadow: 0 4px 40px rgba(101, 68, 18, .45), inset 0 1px 0 rgba(181, 144, 76, .18);
+transition: background .4s, box-shadow .4s;
+}
+
+nav.on {
+background: rgba(80, 50, 10, .58);
+box-shadow: 0 6px 50px rgba(80, 50, 10, .6), inset 0 1px 0 rgba(181, 144, 76, .22);
+}
+
+.nav-logo {
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .6rem;
+letter-spacing: .6em;
+text-transform: uppercase;
+color: var(--gold);
+text-decoration: none;
+}
+
+.nav-links {
+display: flex;
+gap: 2.4rem;
+list-style: none;
+}
+
+.nav-links a {
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .55rem;
+letter-spacing: .35em;
+text-transform: uppercase;
+color: var(--ink35);
+text-decoration: none;
+transition: color .2s;
+position: relative;
+}
+
+.nav-links a::after {
+content: '';
+position: absolute;
+bottom: -3px;
+left: 0;
+right: 0;
+height: 1px;
+background: var(--gold);
+transform: scaleX(0);
+transform-origin: left;
+transition: transform .3s;
+}
+
+.nav-links a:hover {
+color: var(--gold);
+}
+
+.nav-links a:hover::after {
+transform: scaleX(1);
+}
+
+.stat-bar,
+footer {
+position: relative;
+z-index: 1;
+}
+
+.stat-bar {
+background: rgba(13, 12, 15, .85) !important;
+}
+
+/* progress bar */
+#progress {
+position: fixed;
+top: 0;
+left: 0;
+height: 1px;
+width: 0%;
+background: linear-gradient(to right, transparent, var(--gold), var(--gold50));
+z-index: 900;
+transition: width .1s linear;
+}
+
+/* ══════════════════════════════════════════
+HERO — full viewport, centered
+══════════════════════════════════════════ */
+#hero {
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+text-align: center;
+position: relative;
+overflow: hidden;
+padding: 6rem 2rem;
+z-index: 1;
+}
+
+/* animated grid lines */
+.grid-lines {
+position: absolute;
+inset: 0;
+pointer-events: none;
+background-image:
+linear-gradient(var(--rule) 1px, transparent 1px),
+linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+background-size: 80px 80px;
+opacity: 0;
+animation: gridFade 2s 0.5s forwards;
+mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 0%, transparent 75%);
+}
+
+/* ambient glow */
+.hero-glow {
+position: absolute;
+width: 600px;
+height: 600px;
+background: radial-gradient(circle, rgba(181, 144, 76, .12) 0%, transparent 70%);
+border-radius: 50%;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+animation: glowPulse 4s ease-in-out infinite;
+pointer-events: none;
+}
+
+/* bent pyramid background texture */
+.hero-pyramid-texture {
+position: absolute;
+bottom: 0;
+left: 50%;
+transform: translateX(-50%);
+width: min(90vw, 920px);
+height: min(70vh, 600px);
+opacity: 0;
+pointer-events: none;
+z-index: 0;
+background: url('bent_pyramid_bg.png') center bottom no-repeat;
+background-size: contain;
+/* Cinematic filters to make it look like 'dark gold texture' */
+filter: brightness(0.35) contrast(1.4) sepia(0.6) hue-rotate(-10deg) drop-shadow(0 0 100px rgba(181, 144, 76, .15));
+mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+-webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+animation: pyramidReveal 3.5s 0.8s ease-out forwards;
+will-change: transform, opacity;
+}
+
+/* Chapter image styling */
+.ch-image {
+margin: 3.5rem 0;
+border-radius: 20px;
+overflow: hidden;
+box-shadow: 0 40px 80px rgba(0, 0, 0, 0.7), 0 0 40px rgba(181, 144, 76, 0.1);
+position: relative;
+opacity: 1;
+transform: translateY(0);
+transition: opacity .8s .3s, transform .8s .3s;
+line-height: 0;
+}
+
+.js-ready .ch-image {
+opacity: 0;
+transform: translateY(24px);
+}
+
+.js-ready .chapter-inner.revealed .ch-image {
+opacity: 1;
+transform: none;
+}
+
+.ch-image img {
+width: 100%;
+height: auto;
+display: block;
+transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ch-image:hover img {
+transform: scale(1.04);
+}
+
+/* particle canvas — full-page fixed background */
+#particles {
+position: fixed;
+inset: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+z-index: 0;
+}
+
+.hero-eyebrow {
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .6rem;
+letter-spacing: .75em;
+text-transform: uppercase;
+color: var(--gold);
+display: flex;
+align-items: center;
+gap: 1rem;
+margin-bottom: 2.5rem;
+opacity: 0;
+animation: blurUp .8s .4s forwards;
+}
+
+.hero-eyebrow span {
+display: block;
+width: 28px;
+height: 1px;
+background: var(--gold);
+}
+
+/* word-split title animation */
+.hero-title {
+font-family: 'Cormorant Garamond', serif;
+font-weight: 300;
+font-size: clamp(4rem, 13vw, 11rem);
+line-height: .88;
+letter-spacing: -.02em;
+color: var(--ink);
+margin-bottom: 1rem;
+}
+
+.hero-title .word {
+display: inline-block;
+opacity: 0;
+transform: translateY(30px);
+filter: blur(8px);
+animation: wordReveal .8s forwards;
+}
+
+.hero-title .line2 {
+display: block;
+font-style: italic;
+color: var(--ink60);
+font-size: .5em;
+letter-spacing: .05em;
+margin-top: .2em;
+}
+
+.hero-title .line2 .word {
+animation-delay: calc(var(--i)*0.12s + 0.6s);
+}
+
+.hero-sub {
+font-family: 'Cormorant Garamond', serif;
+font-weight: 300;
+font-style: italic;
+font-size: 1.25rem;
+line-height: 1.85;
+color: var(--ink60);
+max-width: 56ch;
+margin: 0 auto 3rem;
+opacity: 0;
+animation: blurUp 1s 1.1s forwards;
+}
+
+.hero-scroll {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: .6rem;
+opacity: 0;
+animation: fadeIn 1s 1.6s forwards;
+}
+
+.hero-scroll span {
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .5rem;
+letter-spacing: .5em;
+text-transform: uppercase;
+color: var(--gold50);
+}
+
+.hero-scroll-line {
+width: 1px;
+height: 60px;
+background: linear-gradient(var(--gold), transparent);
+animation: scrollDrip 2s 2s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════
+STAT BAR — animated counters
+══════════════════════════════════════════ */
+.stat-bar {
+display: grid;
+grid-template-columns: repeat(5, 1fr);
+border-top: 1px solid var(--rule);
+border-bottom: 1px solid var(--rule);
+background: var(--bg2);
+position: relative;
+overflow: hidden;
+}
+
+.stat-bar::after {
+content: '';
+position: absolute;
+inset: 0;
+background: linear-gradient(90deg, transparent, rgba(181, 144, 76, .04), transparent);
+transform: translateX(-100%);
+animation: shimmerBar 3s 1s ease-in-out infinite;
+}
+
+.sitem {
+padding: 2rem 1rem;
+text-align: center;
+border-right: 1px solid var(--rule);
+overflow: hidden;
+}
+
+.sitem:last-child {
+border-right: none;
+}
+
+.snum {
+display: block;
+font-family: 'Cormorant Garamond', serif;
+font-weight: 500;
+font-size: clamp(1.5rem, 2.5vw, 2.3rem);
+color: var(--gold);
+line-height: 1;
+opacity: 1;
+transform: translateY(0);
+transition: opacity .6s, transform .6s;
+}
+
+.js-ready .snum {
+opacity: 0;
+transform: translateY(20px);
+}
+
+.snum.vis {
+opacity: 1;
+transform: none;
+}
+
+.slabel {
+display: block;
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .5rem;
+letter-spacing: .3em;
+text-transform: uppercase;
+color: var(--ink35);
+margin-top: .4rem;
+}
+
+/* ══════════════════════════════════════════
+CONTENT SECTIONS — full-width centered
+══════════════════════════════════════════ */
+.chapter {
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+text-align: center;
+padding: 8rem 2rem;
+position: relative;
+overflow: hidden;
+z-index: 1;
+}
+
+.chapter-inner {
+max-width: 780px;
+width: 100%;
+margin: 0 auto;
+position: relative;
+z-index: 2;
+}
+
+/* chapter label */
+.ch-tag {
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .55rem;
+letter-spacing: .65em;
+text-transform: uppercase;
+color: var(--gold);
+display: inline-flex;
+align-items: center;
+gap: 1rem;
+margin-bottom: 2rem;
+opacity: 1;
+transform: translateY(0);
+transition: opacity .7s, transform .7s;
+}
+
+.ch-tag::before,
+.ch-tag::after {
+content: '';
+display: block;
+width: 20px;
+height: 1px;
+background: var(--gold50);
+}
+
+.js-ready .ch-tag {
+opacity: 0;
+transform: translateY(16px);
+}
+
+.js-ready .chapter-inner.revealed .ch-tag {
+opacity: 1;
+transform: none;
+}
+
+/* chapter heading */
+.ch-title {
+font-family: 'Cormorant Garamond', serif;
+font-weight: 300;
+font-size: clamp(2.5rem, 5vw, 4.5rem);
+line-height: 1.05;
+color: var(--ink);
+margin-bottom: 2rem;
+}
+
+.ch-title em {
+font-style: italic;
+color: var(--ink60);
+}
+
+.ch-title .word {
+display: inline-block;
+opacity: 1;
+transform: translateY(0);
+filter: blur(0);
+transition: opacity .6s, transform .6s, filter .6s;
+}
+
+.js-ready .ch-title .word {
+opacity: 0;
+transform: translateY(20px);
+filter: blur(4px);
+}
+
+.js-ready .chapter-inner.revealed .ch-title .word {
+opacity: 1;
+transform: none;
+filter: blur(0);
+}
+
+/* body text */
+.ch-body {
+font-size: 1.05rem;
+line-height: 2.05;
+color: var(--ink60);
+max-width: 66ch;
+margin: 0 auto;
+text-align: left;
+opacity: 1;
+transform: translateY(0);
+transition: opacity .7s .2s, transform .7s .2s;
+}
+
+.js-ready .ch-body {
+opacity: 0;
+transform: translateY(18px);
+}
+
+.js-ready .chapter-inner.revealed .ch-body {
+opacity: 1;
+transform: none;
+}
+
+.ch-body p {
+margin-bottom: 1.5rem;
+}
+
+.ch-body p:last-child {
+margin: 0;
+}
+
+.ch-body strong {
+color: var(--ink);
+font-weight: 700;
+}
+
+.ch-body em {
+font-style: italic;
+color: rgba(237, 227, 206, .8);
+}
+
+/* drop cap */
+.drop-p::first-letter {
+font-family: 'Cormorant Garamond', serif;
+font-weight: 600;
+font-size: 5rem;
+float: left;
+line-height: .75;
+margin: 0 .12em -.06em 0;
+color: var(--gold);
+}
+
+/* ══════════════════════════════════════════
+FEATURE CARDS — horizontal scroll strip
+══════════════════════════════════════════ */
+.cards-strip {
+width: 100%;
+overflow: hidden;
+position: relative;
+padding: 0 2rem;
+margin-top: 4rem;
+}
+
+.cards-track {
+display: flex;
+gap: 1.5rem;
+width: max-content;
+opacity: 1;
+transform: translateX(0);
+transition: opacity .8s .3s, transform .8s .3s;
+}
+
+.js-ready .cards-track {
+opacity: 0;
+transform: translateX(60px);
+}
+
+.js-ready .chapter-inner.revealed .cards-track {
+opacity: 1;
+transform: none;
+}
+
+.feat-card {
+background: var(--gold08);
+border: 1px solid var(--rule);
+border-radius: 3px;
+padding: 2rem 1.8rem;
+width: 260px;
+flex-shrink: 0;
+text-align: left;
+transition: background .3s, border-color .3s, transform .3s;
+}
+
+.feat-card:hover {
+background: rgba(181, 144, 76, .13);
+border-color: var(--gold50);
+transform: translateY(-4px);
+}
+
+.card-num {
+font-family: 'Cormorant Garamond', serif;
+font-weight: 600;
+font-size: 2.8rem;
+color: rgba(181, 144, 76, .15);
+line-height: 1;
+display: block;
+margin-bottom: .6rem;
+}
+
+.card-title {
+font-family: 'Jost', sans-serif;
+font-weight: 300;
+font-size: .65rem;
+letter-spacing: .25em;
+text-transform: uppercase;
+color: var(--gold);
+margin-bottom: .8rem;
+}
+
+.card-body {
+font-size: .85rem;
+line-height: 1.8;
+color: var(--ink35);
+}
+
+/* ══════════════════════════════════════════
+DATA TABLE (centered)
+══════════════════════════════════════════ */
+.data-table {
+width: 100%;
+border-collapse: collapse;
+margin: 3rem auto 0;
+opacity: 1;
+transform: translateY(0);
+transition: opacity .7s .25s, transform .7s .25s;
+}
+
+.js-ready .data-table {
+opacity: 0;
+transform: translateY(20px);
+}
+
+.js-ready .chapter-inner.revealed .data-table {
+opacity: 1;
+transform: none;
+}
+
+.data-table th {
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .5rem;
+letter-spacing: .4em;
+text-transform: uppercase;
+color: var(--gold);
+border-bottom: 1px solid var(--rule);
+padding: .8rem 1.2rem .8rem 0;
+text-align: left;
+}
+
+.data-table td {
+padding: .75rem 1.2rem .75rem 0;
+border-bottom: 1px solid rgba(181, 144, 76, .07);
+font-size: .9rem;
+line-height: 1.65;
+color: var(--ink60);
+vertical-align: top;
+}
+
+.data-table td:first-child {
+color: var(--ink);
+font-weight: 700;
+}
+
+.data-table tr:last-child td {
+border-bottom: none;
+}
+
+/* ══════════════════════════════════════════
+CALL OUT / NOTES
+══════════════════════════════════════════ */
+.callout {
+background: rgba(181, 144, 76, .05);
+border-left: 2px solid var(--gold50);
+padding: 1.8rem 2.2rem;
+margin: 3rem 0;
+text-align: left;
+opacity: 1;
+transform: translateY(0);
+transition: opacity .6s .3s, transform .6s .3s;
+}
+
+.js-ready .callout {
+opacity: 0;
+transform: translateY(16px);
+}
+
+.js-ready .chapter-inner.revealed .callout {
+opacity: 1;
+transform: none;
+}
+
+.callout p {
+font-family: 'Cormorant Garamond', serif;
+font-weight: 300;
+font-style: italic;
+font-size: 1.1rem;
+line-height: 1.85;
+color: var(--ink60);
+margin: 0;
+}
+
+.consensus {
+background: rgba(181, 144, 76, .06);
+border: 1px solid rgba(181, 144, 76, .28);
+border-left: 3px solid var(--gold);
+padding: 1.5rem 2rem;
+margin: 2.5rem 0;
+text-align: left;
+border-radius: 0 3px 3px 0;
+opacity: 1;
+transform: translateY(0);
+transition: opacity .6s .35s, transform .6s .35s;
+}
+
+.js-ready .consensus {
+opacity: 0;
+transform: translateY(16px);
+}
+
+.js-ready .chapter-inner.revealed .consensus {
+opacity: 1;
+transform: none;
+}
+
+.consensus-tag {
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .48rem;
+letter-spacing: .4em;
+text-transform: uppercase;
+color: var(--gold);
+margin-bottom: .6rem;
+display: block;
+}
+
+.consensus p {
+font-size: .9rem;
+line-height: 1.85;
+color: var(--ink60);
+margin: 0;
+}
+
+.speculative {
+background: rgba(181, 144, 76, .03);
+border: 1px solid rgba(181, 144, 76, .2);
+border-left: 2px solid rgba(181, 144, 76, .4);
+padding: 1.5rem 2rem;
+margin: 2.5rem 0;
+text-align: left;
+border-radius: 0 3px 3px 0;
+opacity: 1;
+transform: translateY(0);
+transition: opacity .6s .3s, transform .6s .3s;
+}
+
+.js-ready .speculative {
+opacity: 0;
+transform: translateY(16px);
+}
+
+.js-ready .chapter-inner.revealed .speculative {
+opacity: 1;
+transform: none;
+}
+
+.spec-tag {
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .48rem;
+letter-spacing: .4em;
+text-transform: uppercase;
+color: rgba(181, 144, 76, .6);
+margin-bottom: .6rem;
+display: block;
+}
+
+.speculative p {
+font-size: .9rem;
+line-height: 1.85;
+color: var(--ink35);
+margin: 0;
+}
+
+/* ══════════════════════════════════════════
+PULL QUOTE
+══════════════════════════════════════════ */
+.pull-quote {
+padding: 3rem 0;
+margin: 2rem 0;
+border-top: 1px solid var(--rule);
+border-bottom: 1px solid var(--rule);
+opacity: 1;
+transform: scale(1);
+transition: opacity .8s, transform .8s;
+}
+
+.js-ready .pull-quote {
+opacity: 0;
+transform: scale(.98);
+}
+
+.js-ready .chapter-inner.revealed .pull-quote {
+opacity: 1;
+transform: none;
+}
+
+.pq-text {
+font-family: 'Cormorant Garamond', serif;
+font-weight: 300;
+font-style: italic;
+font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+line-height: 1.5;
+color: var(--ink60);
+}
+
+.pq-cite {
+display: block;
+margin-top: 1.2rem;
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .52rem;
+letter-spacing: .4em;
+text-transform: uppercase;
+color: var(--gold50);
+}
+
+/* ══════════════════════════════════════════
+PHASE TIMELINE (centered vertical)
+══════════════════════════════════════════ */
+.phase-timeline {
+margin: 3rem 0;
+position: relative;
+text-align: left;
+}
+
+.phase-timeline::before {
+content: '';
+position: absolute;
+left: 17px;
+top: 8px;
+bottom: 0;
+width: 1px;
+background: linear-gradient(to bottom, var(--gold), transparent);
+}
+
+.pt-item {
+display: flex;
+gap: 2rem;
+align-items: flex-start;
+margin-bottom: 3rem;
+padding-left: .5rem;
+opacity: 1;
+transform: translateX(0);
+transition: opacity .6s, transform .6s;
+}
+
+.pt-item:last-child {
+margin-bottom: 0;
+}
+
+.js-ready .pt-item {
+opacity: 0;
+transform: translateX(-20px);
+}
+
+.js-ready .chapter-inner.revealed .pt-item {
+opacity: 1;
+transform: none;
+}
+
+.js-ready .chapter-inner.revealed .pt-item:nth-child(1) {
+transition-delay: .1s;
+}
+
+.js-ready .chapter-inner.revealed .pt-item:nth-child(2) {
+transition-delay: .25s;
+}
+
+.js-ready .chapter-inner.revealed .pt-item:nth-child(3) {
+transition-delay: .4s;
+}
+
+.js-ready .chapter-inner.revealed .pt-item:nth-child(4) {
+transition-delay: .55s;
+}
+
+.js-ready .chapter-inner.revealed .pt-item:nth-child(5) {
+transition-delay: .7s;
+}
+
+.pt-dot {
+flex-shrink: 0;
+width: 10px;
+height: 10px;
+border-radius: 50%;
+background: var(--gold);
+box-shadow: 0 0 12px var(--gold50);
+margin-top: 5px;
+}
+
+.pt-yr {
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .5rem;
+letter-spacing: .4em;
+text-transform: uppercase;
+color: var(--gold50);
+margin-bottom: .3rem;
+}
+
+.pt-title {
+font-family: 'Cormorant Garamond', serif;
+font-weight: 500;
+font-size: 1.15rem;
+color: var(--ink);
+margin-bottom: .35rem;
+}
+
+.pt-body {
+font-size: .9rem;
+line-height: 1.85;
+color: var(--ink60);
+}
+
+/* ══════════════════════════════════════════
+SVG DIAGRAM
+══════════════════════════════════════════ */
+.diagram-wrap {
+margin: 3rem auto 0;
+max-width: 520px;
+opacity: 1;
+transform: translateY(0);
+transition: opacity .8s .2s, transform .8s .2s;
+}
+
+.js-ready .diagram-wrap {
+opacity: 0;
+transform: translateY(24px);
+}
+
+.js-ready .chapter-inner.revealed .diagram-wrap {
+opacity: 1;
+transform: none;
+}
+
+.diagram-cap {
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .5rem;
+letter-spacing: .3em;
+text-transform: uppercase;
+color: var(--ink15);
+text-align: center;
+margin-top: .8rem;
+}
+
+/* ══════════════════════════════════════════
+FACT/SPEC VERDICT GRID
+══════════════════════════════════════════ */
+.verdict {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 1px;
+background: var(--rule);
+border: 1px solid var(--rule);
+margin: 3rem 0;
+text-align: left;
+opacity: 1;
+transform: translateY(0);
+transition: opacity .7s .2s, transform .7s .2s;
+}
+
+.js-ready .verdict {
+opacity: 0;
+transform: translateY(20px);
+}
+
+.js-ready .chapter-inner.revealed .verdict {
+opacity: 1;
+transform: none;
+}
+
+.verdict-col {
+background: var(--bg);
+padding: 2rem 1.8rem;
+}
+
+.verdict-col h4 {
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .55rem;
+letter-spacing: .4em;
+text-transform: uppercase;
+padding-bottom: .8rem;
+border-bottom: 1px solid var(--rule);
+margin-bottom: 1.2rem;
+}
+
+.verdict-col h4.f {
+color: rgba(120, 200, 120, .75);
+}
+
+.verdict-col h4.s {
+color: var(--gold50);
+}
+
+.verdict-col ul {
+list-style: none;
+}
+
+.verdict-col li {
+font-size: .87rem;
+line-height: 1.8;
+color: var(--ink60);
+padding: .3rem 0 .3rem 1rem;
+border-bottom: 1px solid rgba(181, 144, 76, .04);
+position: relative;
+}
+
+.verdict-col li::before {
+content: '—';
+position: absolute;
+left: 0;
+color: var(--rule);
+}
+
+.verdict-col.fv li::before {
+color: rgba(120, 200, 120, .3);
+}
+
+.verdict-col.sv li::before {
+color: rgba(181, 144, 76, .3);
+}
+
+/* ══════════════════════════════════════════
+MATH EQUATIONS
+══════════════════════════════════════════ */
+.eq-block {
+background: var(--gold08);
+border: 1px solid var(--rule);
+padding: 1.8rem 2.2rem;
+margin: 2rem 0;
+position: relative;
+border-radius: 2px;
+opacity: 1;
+transform: translateY(0);
+transition: opacity .6s .2s, transform .6s .2s;
+}
+
+.js-ready .eq-block {
+opacity: 0;
+transform: translateY(14px);
+}
+
+.js-ready .chapter-inner.revealed .eq-block {
+opacity: 1;
+transform: none;
+}
+
+.eq-block::before {
+content: attr(data-label);
+position: absolute;
+top: -.55rem;
+left: 1.2rem;
+background: var(--bg2);
+padding: 0 .5rem;
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .45rem;
+letter-spacing: .4em;
+text-transform: uppercase;
+color: var(--gold50);
+}
+
+.eq {
+font-family: 'Cormorant Garamond', serif;
+font-weight: 400;
+font-size: 1.4rem;
+text-align: center;
+line-height: 2;
+color: var(--ink);
+}
+
+.eq sub,
+.eq sup {
+font-size: .62em;
+}
+
+.eq-note {
+font-family: 'Cormorant Garamond', serif;
+font-style: italic;
+font-size: .95rem;
+text-align: center;
+color: var(--gold50);
+margin-top: .3rem;
+}
+
+/* ══════════════════════════════════════════
+SOURCE TAG
+══════════════════════════════════════════ */
+.src {
+display: inline-block;
+margin-top: .8rem;
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .48rem;
+letter-spacing: .3em;
+text-transform: uppercase;
+color: var(--ink35);
+border-bottom: 1px solid var(--rule);
+padding-bottom: 2px;
+}
+
+/* ══════════════════════════════════════════
+SECTION DIVIDER
+══════════════════════════════════════════ */
+.ch-divider {
+width: 100%;
+height: 1px;
+background: linear-gradient(to right, transparent, var(--rule), transparent);
+}
+
+/* ══════════════════════════════════════════
+ALTERNATE BG SECTIONS — semi-transparent
+so particles remain visible as background
+══════════════════════════════════════════ */
+.chapter.alt {
+background: rgba(13, 12, 15, .78);
+backdrop-filter: blur(0px);
+}
+
+/* Non-alt sections also let particles breathe */
+.chapter:not(.alt) {
+background: rgba(9, 8, 11, .55);
+}
+
+/* ══════════════════════════════════════════
+SECTION ENTRANCE REVEAL
+══════════════════════════════════════════ */
+.js-ready .chapter-inner {
+opacity: 0;
+transform: translateY(32px);
+transition: opacity .9s cubic-bezier(.16, 1, .3, 1), transform .9s cubic-bezier(.16, 1, .3, 1);
+}
+
+.js-ready .chapter-inner.revealed {
+opacity: 1;
+transform: translateY(0);
+}
+
+/* ══════════════════════════════════════════
+FOOTER
+══════════════════════════════════════════ */
+footer {
+border-top: 1px solid var(--rule);
+padding: 5rem 2rem;
+text-align: center;
+}
+
+.f-logo {
+font-family: 'Cormorant Garamond', serif;
+font-weight: 300;
+font-size: 1.8rem;
+color: rgba(181, 144, 76, .28);
+margin-bottom: .8rem;
+}
+
+.f-meta {
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .5rem;
+letter-spacing: .35em;
+text-transform: uppercase;
+color: var(--ink15);
+margin-bottom: 3rem;
+}
+
+.f-refs {
+max-width: 700px;
+margin: 0 auto;
+text-align: left;
+border-top: 1px solid var(--rule);
+padding-top: 2rem;
+}
+
+.f-refs h4 {
+font-family: 'Jost', sans-serif;
+font-weight: 200;
+font-size: .52rem;
+letter-spacing: .45em;
+text-transform: uppercase;
+color: var(--gold50);
+margin-bottom: 1rem;
+}
+
+.f-refs p {
+font-size: .78rem;
+line-height: 1.85;
+color: var(--ink35);
+font-style: italic;
+margin-bottom: .3rem;
+}
+
+/* ══════════════════════════════════════════
+KEYFRAMES
+══════════════════════════════════════════ */
+@keyframes blurUp {
+from {
+opacity: 0;
+transform: translateY(16px);
+filter: blur(6px);
+}
+
+to {
+opacity: 1;
+transform: none;
+filter: blur(0);
+}
+}
+
+@keyframes wordReveal {
+from {
+opacity: 0;
+transform: translateY(30px);
+filter: blur(8px);
+}
+
+to {
+opacity: 1;
+transform: none;
+filter: blur(0);
+}
+}
+
+@keyframes gridFade {
+from {
+opacity: 0
+}
+
+to {
+opacity: .1
+}
+}
+
+@keyframes glowPulse {
+
+0%,
+100% {
+opacity: .6;
+transform: translate(-50%, -50%) scale(1)
+}
+
+50% {
+opacity: 1;
+transform: translate(-50%, -50%) scale(1.1)
+}
+}
+
+@keyframes fadeIn {
+from {
+opacity: 0
+}
+
+to {
+opacity: 1
+}
+}
+
+@keyframes scrollDrip {
+
+0%,
+100% {
+opacity: .4;
+transform: scaleY(1)
+}
+
+50% {
+opacity: 1;
+transform: scaleY(1.12)
+}
+}
+
+@keyframes shimmerBar {
+0% {
+transform: translateX(-100%)
+}
+
+100% {
+transform: translateX(100%)
+}
+}
+
+@keyframes pyramidReveal {
+0% {
+opacity: 0;
+transform: translateX(-50%) translateY(40px);
+}
+
+100% {
+opacity: .15;
+transform: translateX(-50%) translateY(0);
+}
+}
+
+/* ══════════════════════════════════════════
+RESPONSIVE
+══════════════════════════════════════════ */
+@media(max-width:768px) {
+nav {
+padding: 1rem 1.5rem;
+}
+
+.nav-links {
+display: none;
+}
+
+.stat-bar {
+grid-template-columns: repeat(3, 1fr);
+}
+
+.verdict {
+grid-template-columns: 1fr;
+}
+
+.feat-card {
+width: 220px;
+}
+
+.chapter {
+padding: 6rem 2rem;
+}
+
+.ch-title {
+font-size: clamp(2rem, 8vw, 3.5rem);
+}
+}
+</style>
+</head>
+
+<body>
+
+<!-- Full-page particle background -->
+<canvas id="particles"></canvas>
+
+<!-- Cursor -->
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<!-- Progress -->
+<div id="progress"></div>
+
+<!-- ══════════ NAV ══════════ -->
+<nav id="nav">
+<a class="nav-logo" href="#">Sneferu · Dahshur</a>
+<ul class="nav-links">
+<li><a href="#intro">Introduction</a></li>
+<li><a href="#bend">The Bend</a></li>
+<li><a href="#why">Why</a></li>
+<li><a href="#phases">Phases</a></li>
+<li><a href="#interior">Interior</a></li>
+<li><a href="#math">Mathematics</a></li>
+<li><a href="#complex">Complex</a></li>
+<li><a href="#muons">Science</a></li>
+<li><a href="#legacy">Legacy</a></li>
+</ul>
+</nav>
+
+<!-- ══════════ HERO ══════════ -->
+<section id="hero">
+<div class="grid-lines"></div>
+<div class="hero-glow"></div>
+
+<!-- Bent pyramid background texture image -->
+<div class="hero-pyramid-texture"></div>
+
+<div class="hero-eyebrow">
+<span></span>
+Fourth Dynasty &nbsp;·&nbsp; Dahshur, Egypt &nbsp;·&nbsp; c. 2600 BCE
+<span></span>
+</div>
+
+<h1 class="hero-title">
+<span class="word" style="--i:0">THE</span>
+<span class="word" style="--i:1;animation-delay:.16s"> BENT</span>
+<br>
+<span class="word" style="--i:2;animation-delay:.32s">PYRAMID</span>
+<span class="line2">
+<span class="word" style="--i:0">of</span>
+<span class="word" style="--i:1"> Sneferu</span>
+</span>
+</h1>
+
+<p class="hero-sub">A mistake preserved in stone for 4,600 years. The monument that documents — in its very shape —
+the moment ancient Egyptian architects learned how to build a true pyramid.</p>
+
+<div class="hero-scroll">
+<div class="hero-scroll-line"></div>
+<span>Scroll to explore</span>
+</div>
+</section>
+
+<!-- ══════════ STAT BAR ══════════ -->
+<div class="stat-bar">
+<div class="sitem"><span class="snum" data-target="2600" data-suffix=" BCE">—</span><span class="slabel">Year
+Constructed</span></div>
+<div class="sitem"><span class="snum" data-val="104.71 m">—</span><span class="slabel">Total Height</span></div>
+<div class="sitem"><span class="snum" data-val="54° / 43°">—</span><span class="slabel">Lower / Upper Angle</span>
+</div>
+<div class="sitem"><span class="snum" data-val="189.43 m">—</span><span class="slabel">Base Length</span></div>
+<div class="sitem"><span class="snum" data-val="2019">—</span><span class="slabel">Reopened to Visitors</span></div>
+</div>
+
+<!-- ══════════ I. INTRODUCTION ══════════ -->
+<section id="intro" class="chapter">
+<div class="chapter-inner">
+<div class="ch-tag">I. Introduction</div>
+<h2 class="ch-title">
+<span class="word">A Monument</span>
+<span class="word" style="transition-delay:.1s"> That</span>
+<em><span class="word" style="transition-delay:.2s"> Changed Its Mind</span></em>
+</h2>
+<div class="ch-body">
+<p class="drop-p">Approximately 40 kilometres south of Cairo, on the west bank of the Nile at the royal
+necropolis of Dahshur, there stands a pyramid unlike any other in Egypt. Midway up its face, the angle of its
+slope abruptly changes — the lower section rising at a steep 54 degrees, then suddenly flattening to 43
+degrees for the upper portion.</p>
+<p>This is the <strong>Bent Pyramid</strong> — known in antiquity as <em>"The Southern Shining Pyramid"</em> or
+<em>"Sneferu Shines in the South"</em> — built c. 2600 BCE for Pharaoh Sneferu, the founding king of Egypt's
+Fourth Dynasty. It is the second of his three pyramids, and in its unique, kinking profile it preserves for
+posterity something that most monuments conceal: the visible record of a mistake, a correction, and the
+engineering education that ultimately made the Great Pyramid of Giza possible.</p>
+<p>The Bent Pyramid is one of the very few large Egyptian pyramids that retains much of its <strong>original
+outer casing of polished Tura limestone</strong>. After being closed for over 50 years, it was reopened in
+<strong>July 2019</strong>.</p>
+</div>
+
+<!-- Introduction Image -->
+<div class="ch-image">
+<img src="The-bent-pyramid-of-Sneferu.jpg" alt="The Bent Pyramid of Sneferu at Dahshur">
+</div>
+
+<div class="pull-quote">
+<p class="pq-text">"The first angle of the Bent Pyramid suggests the transition phase between the step-pyramid
+design of King Djoser in Saqqara and the later smooth-faced pyramids."</p>
+<span class="pq-cite">— Egyptian Ministry of Tourism and Antiquities</span>
+</div>
+
+<div class="cards-strip">
+<div class="cards-track">
+<div class="feat-card">
+<span class="card-num">01</span>
+<div class="card-title">Ancient Name</div>
+<p class="card-body">Sneferu Shines in the South — the formal name assigned in antiquity, also translated as
+"The Southern Shining Pyramid"</p>
+</div>
+<div class="feat-card">
+<span class="card-num">02</span>
+<div class="card-title">Pharaoh</div>
+<p class="card-body">Sneferu — founding king of the Fourth Dynasty. Builder of three pyramids, the most
+prolific pyramid builder in Egyptian history</p>
+</div>
+<div class="feat-card">
+<span class="card-num">03</span>
+<div class="card-title">Location</div>
+<p class="card-body">Dahshur royal necropolis, west bank of the Nile, 40 km south of Cairo. Fourth Dynasty,
+Old Kingdom.</p>
+</div>
+<div class="feat-card">
+<span class="card-num">04</span>
+<div class="card-title">Unique Distinction</div>
+<p class="card-body">One of approximately 118 known Egyptian pyramids — the only one whose external form
+records a structural revision mid-construction</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<div class="ch-divider"></div>
+
+<!-- ══════════ II. THE BEND ══════════ -->
+<section id="bend" class="chapter alt">
+<div class="chapter-inner">
+<div class="ch-tag">II. Architecture</div>
+<h2 class="ch-title">
+<span class="word">54 Degrees,</span>
+<em><span class="word" style="transition-delay:.15s"> then 43</span></em>
+</h2>
+<div class="ch-body">
+<p class="drop-p">The bend occurs approximately <strong>47 metres above ground level</strong>. Below this point,
+the pyramid's faces rise at 54°27′44″ from the horizontal. Above it, the angle reduces abruptly to 43°22′ —
+giving the monument its rhomboidal silhouette, visible from kilometres across the desert.</p>
+<p>The base is nearly square at <strong>189.43 metres</strong> per side, making it one of the largest pyramids
+by base area. The total height reaches <strong>104.71 metres</strong>. At the bend point, the pyramid's width
+has narrowed to 123.58 metres.</p>
+</div>
+
+<!-- Architecture Detail Image -->
+<div class="ch-image">
+<img src="bent_pyramid_arch.png" alt="Detailed view of the Bent Pyramid's changing angle">
+</div>
+
+<!-- BEND DIAGRAM -->
+<div class="diagram-wrap">
+<svg viewBox="0 0 520 300" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="ar" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+<path d="M0,0 L0,6 L6,3 z" fill="rgba(181,144,76,.7)" />
+</marker>
+<linearGradient id="pyFill" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0%" stop-color="rgba(181,144,76,.12)" />
+<stop offset="100%" stop-color="rgba(181,144,76,.04)" />
+</linearGradient>
+</defs>
+
+<!-- Ground -->
+<line x1="40" y1="265" x2="480" y2="265" stroke="rgba(181,144,76,.15)" stroke-width="1" />
+<rect x="40" y="265" width="440" height="18" fill="rgba(181,144,76,.025)" />
+
+<!-- Pyramid fill -->
+<polygon points="260,35 408,265 112,265" fill="url(#pyFill)" />
+
+<!-- Actual bent profile -->
+<polyline points="112,265 152,183 260,35 368,183 408,265" fill="none" stroke="rgba(181,144,76,.85)"
+stroke-width="2" />
+
+<!-- Dashed ideal-straight lines -->
+<line x1="152" y1="183" x2="112" y2="265" stroke="rgba(181,144,76,.2)" stroke-width="1"
+stroke-dasharray="3,5" />
+<line x1="368" y1="183" x2="408" y2="265" stroke="rgba(181,144,76,.2)" stroke-width="1"
+stroke-dasharray="3,5" />
+<!-- Horizontal bend line -->
+<line x1="120" y1="183" x2="400" y2="183" stroke="rgba(181,144,76,.25)" stroke-width="1"
+stroke-dasharray="4,5" />
+
+<!-- Height lines -->
+<line x1="260" y1="35" x2="260" y2="265" stroke="rgba(181,144,76,.12)" stroke-width="1"
+stroke-dasharray="2,4" />
+
+<!-- Lower brace -->
+<line x1="430" y1="265" x2="430" y2="183" stroke="rgba(181,144,76,.3)" stroke-width="1" />
+<line x1="424" y1="265" x2="436" y2="265" stroke="rgba(181,144,76,.3)" stroke-width="1" />
+<line x1="424" y1="183" x2="436" y2="183" stroke="rgba(181,144,76,.3)" stroke-width="1" />
+<text x="442" y="229" font-family="Cormorant Garamond,serif" font-size="13" fill="rgba(181,144,76,.8)">47.04
+m</text>
+<text x="442" y="248" font-family="Jost,sans-serif" font-size="9" fill="rgba(181,144,76,.5)">54°</text>
+
+<!-- Upper brace -->
+<line x1="430" y1="183" x2="430" y2="35" stroke="rgba(181,144,76,.2)" stroke-width="1" />
+<line x1="424" y1="35" x2="436" y2="35" stroke="rgba(181,144,76,.2)" stroke-width="1" />
+<text x="442" y="115" font-family="Cormorant Garamond,serif" font-size="13" fill="rgba(181,144,76,.6)">57.67
+m</text>
+<text x="442" y="132" font-family="Jost,sans-serif" font-size="9" fill="rgba(181,144,76,.35)">43°</text>
+
+<!-- Lower angle arc -->
+<path d="M 148,265 A 36,36 0 0 1 126,242" fill="none" stroke="rgba(181,144,76,.55)" stroke-width="1.2" />
+<text x="100" y="258" font-family="Cormorant Garamond,serif" font-size="14"
+fill="rgba(237,227,206,.65)">54°</text>
+
+<!-- Upper angle arc -->
+<path d="M 316,183 A 25,25 0 0 1 302,162" fill="none" stroke="rgba(181,144,76,.35)" stroke-width="1" />
+<text x="322" y="173" font-family="Cormorant Garamond,serif" font-size="11"
+fill="rgba(237,227,206,.45)">43°</text>
+
+<!-- Bend label -->
+<line x1="152" y1="183" x2="82" y2="148" stroke="rgba(181,144,76,.25)" stroke-width=".8" />
+<text x="14" y="145" font-family="Jost,sans-serif" font-size="8" fill="rgba(181,144,76,.6)">BEND</text>
+<text x="8" y="157" font-family="Jost,sans-serif" font-size="8" fill="rgba(181,144,76,.4)">POINT</text>
+
+<!-- Total -->
+<text x="260" y="15" font-family="Cormorant Garamond,serif" font-size="13" fill="rgba(181,144,76,.5)"
+text-anchor="middle">Total: 104.71 m</text>
+
+<text x="260" y="287" font-family="Jost,sans-serif" font-size="9" fill="rgba(237,227,206,.15)"
+text-anchor="middle">THE BENT PYRAMID — SLOPE CHANGE AT 47 METRES ABOVE BASE</text>
+</svg>
+<p class="diagram-cap">Bent Pyramid profile · Lower face 54°27′44″ · Upper face 43°22′ · Bend at 47.04 m</p>
+</div>
+
+<table class="data-table">
+<thead>
+<tr>
+<th>Feature</th>
+<th>Measurement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Base length</td>
+<td>189.43 m (621 ft)</td>
+</tr>
+<tr>
+<td>Total height</td>
+<td>104.71 m (344 ft)</td>
+</tr>
+<tr>
+<td>Height below bend</td>
+<td>47.04 m (154 ft)</td>
+</tr>
+<tr>
+<td>Height above bend</td>
+<td>57.67 m (189 ft)</td>
+</tr>
+<tr>
+<td>Base width at bend</td>
+<td>123.58 m (405 ft)</td>
+</tr>
+<tr>
+<td>Lower slope</td>
+<td>54°27′44″</td>
+</tr>
+<tr>
+<td>Upper slope</td>
+<td>43°22′</td>
+</tr>
+<tr>
+<td>Total volume</td>
+<td>1,237,040 m³</td>
+</tr>
+</tbody>
+</table>
+<span class="src">Source: Egyptian Ministry of Tourism and Antiquities</span>
+</div>
+</section>
+
+<div class="ch-divider"></div>
+
+<!-- ══════════ III. WHY ══════════ -->
+<section id="why" class="chapter">
+<div class="chapter-inner">
+<div class="ch-tag">III. The Reason for the Bend</div>
+<h2 class="ch-title">
+<span class="word">Four Theories,</span>
+<em><span class="word" style="transition-delay:.15s"> One Answer</span></em>
+</h2>
+<div class="ch-body">
+<p class="drop-p">The reason for the Bent Pyramid's distinctive kink has been debated for over a century. Four
+main theories have been advanced. One has emerged as the scholarly consensus — and the position of the
+Egyptian Ministry of Antiquities itself.</p>
+</div>
+
+<!-- Theory Chapter Image -->
+<div class="consensus">
+<span class="consensus-tag">◉ Theory 1 — Structural Instability · Scholarly Consensus · Ministry Position</span>
+<p>The builders realized the original 54-degree angle was too steep to remain structurally stable as the pyramid
+rose. Cracks or signs of stress appeared in the lower sections, forcing the architects to reduce the slope to
+prevent catastrophic collapse. The Egyptian Ministry of Tourism and Antiquities states directly that the angle
+was adjusted <em>"due to an overload of blocks resulting in instability."</em> Sneferu's subsequent Red
+Pyramid was built at a consistent 43-degree angle — the same gradient proven viable here.</p>
+</div>
+
+<div class="ch-body" style="margin-top:0">
+<p><strong>Theory 2 — The Meidum Collapse.</strong> In 1974, physicist Kurt Mendelssohn proposed that the angle
+change was a direct safety response to the collapse of the Meidum Pyramid — another structure attributed to
+Sneferu — while still under construction. Witnessing catastrophic failure at Meidum, the builders at Dahshur
+made an emergency correction.</p>
+<p><strong>Theory 3 — Ramp Construction Limits.</strong> At angles steeper than approximately 52 degrees, the
+geometry of construction ramp design becomes untenable — there is insufficient room to build ramps of workable
+width. The pyramid's three phases document the builders discovering, through experience, the steepest
+practical construction angle.</p>
+</div>
+
+<div class="speculative">
+<span class="spec-tag">⚠ Theory 4 — Religious or Symbolic Reasons · Speculative</span>
+<p>Some Egyptologists propose the angle change reflects a deliberate theological shift — from the steep
+"staircase to the stars" concept of step pyramids to solar cult symbolism. No contemporary inscription or
+architectural document supports this as a conscious design choice.</p>
+</div>
+
+<span class="src">Source: Egyptian Ministry of Tourism and Antiquities; Mendelssohn (1974); Verner (2001)</span>
+</div>
+</section>
+
+<div class="ch-divider"></div>
+
+<!-- ══════════ IV. PHASES ══════════ -->
+<section id="phases" class="chapter alt">
+<div class="chapter-inner">
+<div class="ch-tag">IV. Construction Phases</div>
+<h2 class="ch-title">
+<span class="word">Three Plans,</span>
+<em><span class="word" style="transition-delay:.15s"> One Pyramid</span></em>
+</h2>
+<div class="ch-body">
+<p class="drop-p">The Bent Pyramid was not constructed according to a single unchanging design. Archaeological
+evidence — masonry seams, offset points in the corridors, changing construction techniques — reveals
+<strong>three distinct phases</strong> of planning and execution. Each reflects a revision of the previous
+one.</p>
+</div>
+
+<!-- Construction Phases Image -->
+<div class="ch-image">
+<img src="Construction Phases.jpg" alt="Close-up of the masonry changes in the Bent Pyramid">
+</div>
+
+<div class="cards-strip">
+<div class="cards-track">
+<div class="feat-card">
+<span class="card-num">1</span>
+<div class="card-title">Initial Plan · ~58–60°</div>
+<p class="card-body">A very steep pyramid with a 157 m base and ~58–60° inclination. At this angle it would
+have reached ~125 m. Detectable only through offset points in the corridors — likely never progressed
+beyond a few layers.</p>
+</div>
+<div class="feat-card">
+<span class="card-num">2</span>
+<div class="card-title">First Revision · 54°</div>
+<p class="card-body">Angle reduced to 54°, base extended to 188 m. Inclined wall layers used — inherited
+from step pyramid construction. Completed at this angle, the pyramid would have been 129.4 m — third
+tallest in the world.</p>
+</div>
+<div class="feat-card">
+<span class="card-num">3</span>
+<div class="card-title">Final Revision · 43°</div>
+<p class="card-body">At ~49 m height, the angle reduced to 43°. From this point: horizontal masonry layers —
+the technique used in all subsequent true pyramids. This transition marks the precise moment Egyptian
+architects mastered modern pyramid construction.</p>
+</div>
+</div>
+</div>
+
+<div class="callout">
+<p>The shift from inclined to horizontal masonry in Phase 3 is one of the most consequential technical decisions
+in the history of architecture. Horizontal courses distribute load vertically and allow precise geometry at
+any scale. The Great Pyramid of Giza is, in a direct technical sense, the descendant of this decision made at
+Dahshur.</p>
+</div>
+
+<span class="src">Source: Lehner (1997); Verner (2001)</span>
+</div>
+</section>
+
+<div class="ch-divider"></div>
+
+<!-- ══════════ V. INTERIOR ══════════ -->
+<section id="interior" class="chapter">
+<div class="chapter-inner">
+<div class="ch-tag">V. Interior</div>
+<h2 class="ch-title">
+<span class="word">Two Entrances,</span>
+<em><span class="word" style="transition-delay:.15s"> Two Systems</span></em>
+</h2>
+<div class="ch-body">
+<p class="drop-p">Unlike most Egyptian pyramids with a single north-face entrance, the Bent Pyramid has
+<strong>two completely separate entrance systems</strong> — one on the north face and one on the west face —
+each leading to its own distinct chambers, connected only by a rough later passage.</p>
+</div>
+
+<table class="data-table">
+<thead>
+<tr>
+<th>Feature</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Northern entrance height</td>
+<td>11.80 m above ground level</td>
+</tr>
+<tr>
+<td>Northern passage</td>
+<td>74 m · 25° descent to corbelled antechamber</td>
+</tr>
+<tr>
+<td>Northern burial chamber</td>
+<td>4.96 × 4.30 m · Corbelled vault 17.20 m high</td>
+</tr>
+<tr>
+<td>Western entrance height</td>
+<td>33.32 m above ground level</td>
+</tr>
+<tr>
+<td>Western passage</td>
+<td>67.66 m · Leads to chambers within pyramid body</td>
+</tr>
+<tr>
+<td>Portcullis mechanism</td>
+<td>Two blocks sliding on 45° ramps (unique — not vertical)</td>
+</tr>
+<tr>
+<td>Ancient cedar wood</td>
+<td>Still propping one portcullis block after 4,600 years</td>
+</tr>
+<tr>
+<td>Connecting passage</td>
+<td>~15 m ladder through roof hole of northern chamber</td>
+</tr>
+<tr>
+<td>Evidence of burial</td>
+<td>None found in either chamber system</td>
+</tr>
+</tbody>
+</table>
+
+<div class="ch-image">
+<img src="Interior.jpg" alt="Interior corbelled vault representation" style="filter: brightness(0.5) contrast(1.5) sepia(0.4) hue-rotate(-10deg); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+</div>
+
+<div class="callout">
+<p>The portcullis blocks in the western passage are sealed by sliding down 45-degree ramps rather than dropping
+vertically — a unique mechanism found nowhere else among Egyptian pyramids. One block was lowered in
+antiquity; the other remains held open by a piece of cedar wood that has survived 4,600 years in the sealed
+corridor.</p>
+</div>
+
+<span class="src">Source: Lehner (1997); Verner (2001)</span>
+</div>
+</section>
+
+<div class="ch-divider"></div>
+
+<!-- ══════════ VI. MATHEMATICS ══════════ -->
+<section id="math" class="chapter alt">
+<div class="chapter-inner">
+<div class="ch-tag">VI. Mathematics</div>
+<h2 class="ch-title">
+<span class="word">Slope, Seked,</span>
+<em><span class="word" style="transition-delay:.18s"> and What the Numbers Tell Us</span></em>
+</h2>
+<div class="ch-body">
+<p class="drop-p">The Bent Pyramid's three construction phases — each at a different slope angle — offer a
+unique opportunity to observe Egyptian architectural mathematics in action. Angles were expressed not in
+degrees but through the <strong>seked</strong> system: horizontal run in palms per vertical cubit of rise.</p>
+</div>
+
+<div class="eq-block" data-label="Seked Formula">
+<div class="eq">tan(θ) = 7 ÷ Seked &nbsp;&nbsp;→&nbsp;&nbsp; Seked = 7 ÷ tan(θ)</div>
+<div class="eq-note">θ = face angle from horizontal · 7 palms = 1 royal cubit (52.3 cm)</div>
+</div>
+
+<table class="data-table">
+<thead>
+<tr>
+<th>Phase / Pyramid</th>
+<th>Angle</th>
+<th>Seked</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Phase 1 (abandoned)</td>
+<td>~58–60°</td>
+<td>~4.0–4.3 palms</td>
+<td>Structurally untenable at scale</td>
+</tr>
+<tr>
+<td>Phase 2 — Lower section</td>
+<td>54°27′44″</td>
+<td>≈ 5.0 palms</td>
+<td>Steep; inclined masonry courses</td>
+</tr>
+<tr>
+<td>Phase 3 — Upper section</td>
+<td>43°22′</td>
+<td>≈ 7.4 palms</td>
+<td>Horizontal masonry; the stable answer</td>
+</tr>
+<tr>
+<td>Red Pyramid (Sneferu)</td>
+<td>43°22′</td>
+<td>≈ 7.4 palms</td>
+<td>Same seked — first successful true pyramid</td>
+</tr>
+<tr>
+<td>Great Pyramid (Khufu)</td>
+<td>51°50′40″</td>
+<td>5½ palms</td>
+<td>Refined; steeper with perfected horizontal masonry</td>
+</tr>
+</tbody>
+</table>
+
+<div class="eq-block" data-label="Volume Reduction Across Phases">
+<div class="eq">Phase 2 (if complete at 54°): ~1,524,000 m³</div>
+<div class="eq-note">Final form at 43° upper: 1,237,040 m³ · Reduction: ~287,000 m³ of stone not placed</div>
+</div>
+
+<div class="callout">
+<p>The transition from inclined to horizontal masonry at the bend is not merely a stylistic change — it is the
+solving of a structural mathematics problem. Horizontal courses allow load paths to be computed and managed
+predictably at any pyramid height. Every true pyramid built after the Bent Pyramid uses this technique.</p>
+</div>
+
+<span class="src">Source: Rossi, C. (2004). Architecture and Mathematics in Ancient Egypt</span>
+</div>
+</section>
+
+<div class="ch-divider"></div>
+
+<!-- ══════════ VII. COMPLEX ══════════ -->
+<section id="complex" class="chapter">
+<div class="chapter-inner">
+<div class="ch-tag">VII. The Associated Complex</div>
+<h2 class="ch-title">
+<span class="word">Satellite Pyramid,</span>
+<em><span class="word" style="transition-delay:.15s"> Temple &amp; Causeway</span></em>
+</h2>
+
+<!-- Complex Chapter Image -->
+<div class="ch-image">
+<img src="The Associated Complex.jpg" alt="View of the pyramid complex and satellite pyramid" style="filter: brightness(0.9) contrast(1.1);">
+</div>
+
+<div class="cards-strip">
+<div class="cards-track">
+<div class="feat-card">
+<span class="card-num">01</span>
+<div class="card-title">Satellite Pyramid</div>
+<p class="card-body">55 m south of the main pyramid. Original height: 26 m. Base: 52.80 m. Assumed built for
+Queen Hetepheres. Corbel vault ceiling. Opened to public 2019 — first time since its 1956 excavation.</p>
+</div>
+<div class="feat-card">
+<span class="card-num">02</span>
+<div class="card-title">Valley Temple</div>
+<p class="card-body">26.20 × 47.16 m (50 × 90 cubits). Three sections: two covered areas flanking an open
+court. Bevelled edges and pillar reliefs — among the earliest decorated stone architecture at this scale.
+</p>
+</div>
+<div class="feat-card">
+<span class="card-num">03</span>
+<div class="card-title">The Causeway</div>
+<p class="card-body">700 m paved with limestone. Low walls allowed sand drift to block passage — a design
+failure directly addressed by later builders. All subsequent Fourth Dynasty pyramid causeways were
+covered, protecting them from the elements.</p>
+</div>
+<div class="feat-card">
+<span class="card-num">04</span>
+<div class="card-title">Casing Preservation</div>
+<p class="card-body">The Bent Pyramid retains much of its original Tura limestone casing — unique among
+large pyramids. Peter James proposes intentional larger block clearances acted as expansion joints,
+preventing thermal damage that stripped other pyramids.</p>
+</div>
+</div>
+</div>
+
+<span class="src">Source: Lehner (1997). The Complete Pyramids</span>
+</div>
+</section>
+
+<div class="ch-divider"></div>
+
+<!-- ══════════ VIII. MUONS ══════════ -->
+<section id="muons" class="chapter alt">
+<div class="chapter-inner">
+<div class="ch-tag">VIII. Modern Science · 2016</div>
+<h2 class="ch-title">
+<span class="word">Cosmic Rays</span>
+<em><span class="word" style="transition-delay:.18s"> and Hidden Chambers</span></em>
+</h2>
+<div class="ch-body">
+<p class="drop-p">In 2016, an international research team from Egypt, France, Japan, and Canada conducted a
+study of the Bent Pyramid using <strong>cosmic-ray muon tomography</strong> — a non-invasive imaging technique
+that uses subatomic particles from cosmic radiation to penetrate solid stone and map internal structures
+without excavation.</p>
+</div>
+
+<!-- Modern Science Scan Image -->
+
+<div class="cards-strip">
+<div class="cards-track">
+<div class="feat-card">
+<span class="card-num">01</span>
+<div class="card-title">3D Internal Image</div>
+<p class="card-body">The study constructed the first three-dimensional internal image of the Bent Pyramid —
+revealing its full structural profile non-invasively for the first time.</p>
+</div>
+<div class="feat-card">
+<span class="card-num">02</span>
+<div class="card-title">Two Unknown Voids</div>
+<p class="card-body">Two previously unknown cavities were identified within the pyramid's structure — two
+chambers stacked vertically, separated by approximately 18 metres. Their contents remain unknown.</p>
+</div>
+<div class="feat-card">
+<span class="card-num">03</span>
+<div class="card-title">No Burial Found</div>
+<p class="card-body">The scans definitively ruled out the possibility that Sneferu was buried within the
+Bent Pyramid — resolving a longstanding archaeological question about the monument's funerary function.
+</p>
+</div>
+</div>
+</div>
+
+<div class="callout">
+<p>The same muon tomography technique was applied to the Great Pyramid of Giza the following year, confirming
+the existence of a large previously unknown void above the Grand Gallery in 2017. The Bent Pyramid was the
+proof of concept that made this possible.</p>
+</div>
+
+<span class="src">Source: Published scientific research, ScanPyramids-affiliated team (2016)</span>
+</div>
+</section>
+
+<div class="ch-divider"></div>
+
+<!-- ══════════ IX. LEGACY ══════════ -->
+<section id="legacy" class="chapter">
+<div class="chapter-inner">
+<div class="ch-tag">IX. Legacy</div>
+<h2 class="ch-title">
+<span class="word">The Road from</span>
+<em><span class="word" style="transition-delay:.15s"> Saqqara to Giza</span></em>
+</h2>
+<div class="ch-body">
+<p class="drop-p">The Bent Pyramid occupies a precisely defined position in the evolution of Egyptian pyramid
+architecture. It is the monument that stands between the world's first pyramid — Djoser's Step Pyramid — and
+the world's most perfect pyramid — Khufu's Great Pyramid at Giza. It is the point where experimentation,
+failure, and correction converged.</p>
+</div>
+
+<!-- Legacy/Evolution Image -->
+<div class="ch-image">
+<img src="Legacy.jpg" alt="The evolution of the pyramid form" style="filter: brightness(0.8) contrast(1.2);">
+</div>
+
+<div class="phase-timeline">
+<div class="pt-item">
+<div class="pt-dot"></div>
+<div class="pt-content">
+<div class="pt-yr">c. 2667–2648 BCE</div>
+<div class="pt-title">Step Pyramid — Djoser, Saqqara</div>
+<p class="pt-body">Six tiers of inward-leaning limestone. 62.5 m. World's first large-scale stone monument.
+Inclined masonry throughout. Imhotep's invention that started everything.</p>
+</div>
+</div>
+<div class="pt-item">
+<div class="pt-dot"></div>
+<div class="pt-content">
+<div class="pt-yr">c. 2613 BCE</div>
+<div class="pt-title">Meidum Pyramid — Huni / Sneferu</div>
+<p class="pt-body">Eight-stepped pyramid converted to a true pyramid. Outer casing later collapsed, leaving
+the stepped core exposed — a visual diagram of the transition from stepped to smooth form.</p>
+</div>
+</div>
+<div class="pt-item">
+<div class="pt-dot"></div>
+<div class="pt-content">
+<div class="pt-yr">c. 2600 BCE</div>
+<div class="pt-title">Bent Pyramid — Sneferu, Dahshur</div>
+<p class="pt-body">104.71 m. Three phases. Two slope angles. The transition from inclined to horizontal
+masonry. The only pyramid in history whose external form records a structural revision mid-construction.
+</p>
+</div>
+</div>
+<div class="pt-item">
+<div class="pt-dot"></div>
+<div class="pt-content">
+<div class="pt-yr">c. 2590 BCE</div>
+<div class="pt-title">Red Pyramid — Sneferu, Dahshur</div>
+<p class="pt-body">104 m. Consistent 43° slope throughout. Horizontal masonry from base to apex. First
+successful true smooth-sided pyramid. For a brief period, the tallest man-made structure on Earth.</p>
+</div>
+</div>
+<div class="pt-item">
+<div class="pt-dot"></div>
+<div class="pt-content">
+<div class="pt-yr">c. 2589–2566 BCE</div>
+<div class="pt-title">Great Pyramid — Khufu, Giza</div>
+<p class="pt-body">146.5 m. 51°50′40″. 2.3 million blocks. North alignment to within 0.05°. The culmination
+of the architectural evolution set in motion by the structural crisis at Dahshur.</p>
+</div>
+</div>
+</div>
+
+<div class="verdict">
+<div class="verdict-col fv">
+<h4 class="f">✓ Established Facts</h4>
+<ul>
+<li>Built by Sneferu, c. 2600 BCE — Fourth Dynasty</li>
+<li>Dahshur, 40 km south of Cairo</li>
+<li>Base 189.43 m · Height 104.71 m — measured and verified</li>
+<li>Lower slope 54°27′44″ · Upper slope 43°22′</li>
+<li>Retains original Tura limestone casing — unique</li>
+<li>Two separate entrances (north and west)</li>
+<li>Two corbelled chamber systems — physically verified</li>
+<li>45°-ramp portcullis; cedar wood survivor</li>
+<li>Satellite pyramid 55 m south — Queen Hetepheres</li>
+<li>Reopened July 2019</li>
+<li>Muon tomography 2016 — two internal voids found</li>
+<li>Muon scanning ruled out Sneferu's burial</li>
+<li>Three construction phases with changing technique</li>
+</ul>
+</div>
+<div class="verdict-col sv">
+<h4 class="s">~ Theories and Debate</h4>
+<ul>
+<li>Angle changed due to structural instability — Scholarly consensus; Ministry position</li>
+<li>Angle changed responding to Meidum collapse — Mendelssohn 1974; widely discussed</li>
+<li>Angle changed due to ramp construction limits — Geometric analysis; gaining acceptance</li>
+<li>Angle changed for religious/symbolic reasons — Speculative; no documentary support</li>
+<li>Casing survived via expansion-joint clearances — Engineering hypothesis; unproven</li>
+<li>Casing survived because steep slope deterred robbers — Alternative; also unproven</li>
+<li>Purpose of two identified internal voids — Unknown; not yet accessed</li>
+</ul>
+</div>
+</div>
+
+<div class="pull-quote">
+<p class="pq-text">"Each of Sneferu's three pyramids shows the builders learning — and the Bent Pyramid is where
+the lesson was hardest, and the correction most visible."</p>
+<span class="pq-cite">— Synthesis of Lehner (1997) and Verner (2001)</span>
+</div>
+
+</div>
+</section>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer>
+<div class="f-logo">The Bent Pyramid of Sneferu</div>
+<p class="f-meta">Dahshur, Egypt · Fourth Dynasty · c. 2600 BCE</p>
+<div class="f-refs">
+<h4>Sources and Bibliography</h4>
+<p>Egyptian Ministry of Tourism and Antiquities. Official architectural and historical records.</p>
+<p>Lehner, M. (1997). The Complete Pyramids. Thames &amp; Hudson.</p>
+<p>Mendelssohn, K. (1974). The Riddle of the Pyramids. Praeger Publishers.</p>
+<p>Rossi, C. (2004). Architecture and Mathematics in Ancient Egypt. Cambridge University Press.</p>
+<p>ScanPyramids Project (2016). Muon tomography study of the Bent Pyramid. International research consortium.</p>
+<p>Verner, M. (2001). The Pyramids. Grove Press.</p>
+<p>James, P. Structural engineering analysis of Bent Pyramid casing preservation.</p>
+</div>
+</footer>
+
+<script>
+/* ──────── JS READY — enable animations only when JS runs ──────── */
+document.body.classList.add('js-ready');
+
+/* ──────── CURSOR ──────── */
+const cur = document.getElementById('cur');
+const curRing = document.getElementById('cur-ring');
+let mx = 0, my = 0;
+document.addEventListener('mousemove', e => {
+mx = e.clientX; my = e.clientY;
+cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+});
+setInterval(() => {
+curRing.style.left = mx + 'px'; curRing.style.top = my + 'px';
+}, 50);
+
+/* ──────── PROGRESS BAR ──────── */
+window.addEventListener('scroll', () => {
+const pct = (scrollY / (document.body.scrollHeight - innerHeight)) * 100;
+document.getElementById('progress').style.width = pct + '%';
+document.getElementById('nav').classList.toggle('on', scrollY > 60);
+});
+
+/* ──────── PARTICLE CANVAS — full page background ──────── */
+(function () {
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let W, H, pts = [];
+
+function resize() {
+W = canvas.width = window.innerWidth;
+H = canvas.height = window.innerHeight;
+// rebuild particles spread across full viewport
+pts = [];
+const count = Math.floor((W * H) / 8000); // density scales with screen area
+for (let i = 0; i < count; i++) pts.push({
+x: Math.random() * W,
+y: Math.random() * H,
+r: Math.random() * 1.1 + .3,
+vx: (Math.random() - .5) * .14,
+vy: (Math.random() - .5) * .14,
+a: Math.random() * Math.PI * 2
+});
+}
+
+function draw() {
+ctx.clearRect(0, 0, W, H);
+pts.forEach(p => {
+p.x += p.vx; p.y += p.vy;
+// wrap edges
+if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+p.a += .004;
+const al = .28 + .28 * Math.abs(Math.sin(p.a));
+ctx.beginPath();
+ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+ctx.fillStyle = `rgba(181,144,76,${al})`;
+ctx.fill();
+});
+// connecting lines between nearby particles
+const len = pts.length;
+for (let i = 0; i < len; i++) {
+for (let j = i + 1; j < len; j++) {
+const dx = pts[i].x - pts[j].x;
+const dy = pts[i].y - pts[j].y;
+const d = Math.sqrt(dx * dx + dy * dy);
+if (d < 150) {
+ctx.beginPath();
+ctx.moveTo(pts[i].x, pts[i].y);
+ctx.lineTo(pts[j].x, pts[j].y);
+ctx.strokeStyle = `rgba(181,144,76,${.10 * (1 - d / 150)})`;
+ctx.lineWidth = .6;
+ctx.stroke();
+}
+}
+}
+requestAnimationFrame(draw);
+}
+
+window.addEventListener('resize', resize);
+resize();
+draw();
+})();
+
+/* ──────── STAT COUNTER ANIMATION ──────── */
+(function () {
+const io = new IntersectionObserver(entries => {
+entries.forEach(e => {
+if (!e.isIntersecting) return;
+const el = e.target;
+el.classList.add('vis');
+const val = el.dataset.val;
+if (val) {
+// just reveal the fixed text
+setTimeout(() => { el.textContent = val; }, 200);
+} else if (el.dataset.target) {
+const target = parseInt(el.dataset.target);
+const suffix = el.dataset.suffix || '';
+let start = null;
+const duration = 1400;
+function step(ts) {
+if (!start) start = ts;
+const p = Math.min((ts - start) / duration, 1);
+const eased = 1 - Math.pow(1 - p, 3);
+el.textContent = Math.floor(target * eased) + suffix;
+if (p < 1) requestAnimationFrame(step);
+}
+requestAnimationFrame(step);
+}
+io.unobserve(el);
+});
+}, { threshold: .5 });
+document.querySelectorAll('.snum').forEach(el => io.observe(el));
+})();
+
+/* ──────── CHAPTER REVEAL (opacity + stagger) ──────── */
+(function () {
+function reveal(el) {
+el.classList.add('revealed');
+el.querySelectorAll('.ch-title .word').forEach((w, i) => {
+w.style.transitionDelay = (i * .12 + .05) + 's';
+});
+}
+
+const io = new IntersectionObserver(entries => {
+entries.forEach(e => {
+if (!e.isIntersecting) return;
+reveal(e.target);
+io.unobserve(e.target);
+});
+}, { threshold: .05, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.chapter-inner').forEach(el => io.observe(el));
+
+// Safety fallback: force-reveal any element already in viewport after 300ms
+// (IntersectionObserver sometimes doesn't fire on load for local file:// URLs)
+setTimeout(() => {
+document.querySelectorAll('.chapter-inner:not(.revealed)').forEach(el => {
+const rect = el.getBoundingClientRect();
+if (rect.top < window.innerHeight && rect.bottom > 0) {
+reveal(el);
+}
+});
+}, 300);
+})();
+
+/* ──────── HORIZONTAL CARD DRAG SCROLL ──────── */
+document.querySelectorAll('.cards-strip').forEach(strip => {
+const track = strip.querySelector('.cards-track');
+if (!track) return;
+let isDragging = false, startX = 0, scrollLeft = 0;
+strip.addEventListener('mousedown', e => { isDragging = true; startX = e.pageX; scrollLeft = strip.scrollLeft; strip.style.cursor = 'grabbing'; });
+strip.addEventListener('mouseleave', () => { isDragging = false; strip.style.cursor = ''; });
+strip.addEventListener('mouseup', () => { isDragging = false; strip.style.cursor = ''; });
+strip.addEventListener('mousemove', e => {
+if (!isDragging) return;
+e.preventDefault();
+const dx = e.pageX - startX;
+strip.scrollLeft = scrollLeft - dx;
+});
+strip.style.overflowX = 'auto';
+strip.style.scrollbarWidth = 'none';
+strip.style.msOverflowStyle = 'none';
+});
+
+/* ──────── PYRAMID PARALLAX ──────── */
+(function () {
+const pyr = document.querySelector('.hero-pyramid-bg');
+const hero = document.getElementById('hero');
+if (!pyr || !hero) return;
+
+hero.addEventListener('mousemove', (e) => {
+const rx = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+const ry = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+
+// Subtle translation (parallax)
+const tx = rx * -15;
+const ty = ry * -10;
+
+pyr.style.transform = `translateX(calc(-50% + ${tx}px)) translateY(${ty}px)`;
+});
+})();
+</script>
+</body>
+
+</html>
